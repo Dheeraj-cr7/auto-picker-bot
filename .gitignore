@@ -1,0 +1,12 @@
+.env
+node_modules/
+logs/
+screenshots/
+data/
+.DS_Store
+*.log
+yarn.lock
+.vscode/
+.idea/
+dist/
+build/

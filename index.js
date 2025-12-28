@@ -99,6 +99,7 @@ const MOBILE = "7020653153";
   await stealthLogin(page);
   await gotoBuyLead(page);
   await gotoRecentPage(page);
+  await applyForeignLocationFilter(page);
   await moreFilterNavigator(page);
   await applyBasicFilter(page);
 
@@ -162,6 +163,29 @@ const gotoRecentPage = async (page) => {
 };
 
 /**
+ * apply foreign filter
+ */
+const applyForeignLocationFilter = async (page) => {
+  // Hover on Location container
+  await page.waitForSelector('#location_filter', { visible: true });
+  await page.hover('#location_filter');
+
+  // Select Foreign radio
+  await page.waitForSelector('#location_3');
+
+  await page.evaluate(() => {
+    const radio = document.querySelector('#location_3');
+    if (radio && !radio.checked) {
+      radio.checked = true;
+      radio.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  });
+
+  console.log('Foreign location filter applied');
+  return
+};
+
+/**
  * Open More Filters panel
  */
 const moreFilterNavigator = async (page) => {
@@ -196,6 +220,15 @@ const applyBasicFilter = async (page) => {
     }
   });
 
+  // email checkbox
+  await page.evaluate(() => {
+    const cb = document.querySelector('#email_type_id');
+    if (cb && !cb.checked) {
+      cb.checked = true;
+      cb.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  });
+
   // Mobile checkbox
   await page.evaluate(() => {
     const cb = document.querySelector('#mobile_type_id');
@@ -206,10 +239,10 @@ const applyBasicFilter = async (page) => {
   });
 
   // Apply filters
-  await page.evaluate(() => {
-    document.querySelector('.SLC_cp')?.click();
-  });
-
+  // await page.evaluate(() => {
+  //   document.querySelector('.SLC_cp')?.click();
+  // });
+  await page.click('.SLC_cp')
   console.log('Basic filters applied');
   return;
 };

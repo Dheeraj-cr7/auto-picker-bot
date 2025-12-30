@@ -70,6 +70,7 @@ const applyBasicFilter = async (page) => {
 const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const puppeteerCore = require("puppeteer");
+const { handleLogin } = require("./login");
 
 puppeteer.use(StealthPlugin());
 
@@ -79,56 +80,37 @@ const MOBILE = "7020653153";
 
 // ---------------- MAIN ----------------
 (async () => {
-  const browser = await puppeteer.launch({
-    headless: false,
-    executablePath: puppeteerCore.executablePath(),
-    defaultViewport: {
-      width: 1366,
-      height: 768,
-    },
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
+  try {
+    const browser = await puppeteer.launch({
+      headless: false,
+      executablePath: puppeteerCore.executablePath(),
+      defaultViewport: {
+        width: 1366,
+        height: 768,
+      },
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
 
-  const page = await browser.newPage();
+    const page = await browser.newPage();
 
-  await page.goto(URL, {
-    waitUntil: "networkidle2",
-    timeout: 0,
-  });
+    // Handle login with session management
+    const loginResult = await handleLogin(page, URL, MOBILE);
+    console.log(`✨ Login completed using ${loginResult.loginType} method\n`);
 
-  await stealthLogin(page);
-  await gotoBuyLead(page);
-  await gotoRecentPage(page);
-  await applyForeignLocationFilter(page);
-  await moreFilterNavigator(page);
-  await applyBasicFilter(page);
+    await gotoBuyLead(page);
+    await gotoRecentPage(page);
+    await applyForeignLocationFilter(page);
+    await moreFilterNavigator(page);
+    await applyBasicFilter(page);
 
-  // await browser.close();
+    // await browser.close();
+  } catch (error) {
+    console.error("❌ Fatal error in main execution:", error.message);
+    process.exit(1);
+  }
 })();
 
 // ---------------- FUNCTIONS ----------------
-
-/**
- * Login using mobile & OTP
- */
-const stealthLogin = async (page) => {
-  await page.waitForSelector(".npttxt", { visible: true });
-  await page.type(".npttxt", MOBILE, { delay: 120 });
-  await page.keyboard.press("Enter");
-
-  await page.waitForSelector("#reqOtpMobBtn", { visible: true });
-  await page.click("#reqOtpMobBtn");
-
-  console.log("OTP requested — waiting for manual entry");
-
-  // 🔥 WAIT FOR OTP SUCCESS
-  await page.waitForFunction(() => !location.href.includes("login"), {
-    timeout: 0,
-  });
-
-  console.log("Login successful");
-  return;
-};
 
 /**
  * Navigate to Buy Leads section

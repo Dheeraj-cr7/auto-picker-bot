@@ -4,7 +4,7 @@
   "description": "IndiaMART Buy Leads Scraper with automated filtering and lead extraction",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node start.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

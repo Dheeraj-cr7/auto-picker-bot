@@ -3,6 +3,7 @@ node_modules/
 logs/
 screenshots/
 data/
+session/
 .DS_Store
 *.log
 yarn.lock
